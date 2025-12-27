@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Classic Cuts Barber Co. | Reviews</title>
+  <meta name="description" content="Leave a review for Classic Cuts Barber Co. Reviews appear on the site after posting." />
+
+  <style>
+    :root{
+      --bg1:#ffffff;
+      --bg2:#f6f3ee;
+      --ink:#1a1b1e;
+      --muted: rgba(26,27,30,.68);
+      --card: rgba(255,255,255,.86);
+      --stroke: rgba(0,0,0,.10);
+      --shadow: 0 18px 50px rgba(20,20,20,.12);
+      --gold:#c79b2a;
+      --crimson:#d43b45;
+      --azure:#2f7dd6;
+      --mint:#2cc7a2;
+      --r-xl: 28px;
+      --r-lg: 18px;
+      --r-md: 14px;
+      --ease: cubic-bezier(.2,.8,.2,1);
+      --t: 220ms var(--ease);
+      --container: 980px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--ink);
+      background:
+        radial-gradient(1100px 700px at 80% -15%, rgba(47,125,214,.16), transparent 55%),
+        radial-gradient(900px 620px at 10% 0%, rgba(199,155,42,.20), transparent 60%),
+        radial-gradient(900px 650px at 90% 35%, rgba(212,59,69,.10), transparent 58%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 55%, var(--bg1) 100%);
+      line-height:1.55;
+      overflow-x:hidden;
+    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:var(--container); margin:0 auto; padding:0 18px}
+
+    header{
+      position:sticky; top:0; z-index:20;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(to bottom, rgba(255,255,255,.82), rgba(255,255,255,.55));
+      border-bottom: 1px solid rgba(0,0,0,.08);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; padding:14px 0;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .mark{
+      width:38px; height:38px; border-radius: 12px;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(199,155,42,.65), rgba(199,155,42,.06) 58%),
+        linear-gradient(135deg, rgba(212,59,69,.35), rgba(47,125,214,.25));
+      border:1px solid rgba(0,0,0,.06);
+      box-shadow: 0 16px 40px rgba(0,0,0,.12);
+    }
+    .name strong{display:block; letter-spacing:.3px}
+    .name span{display:block; font-size:12.5px; color:var(--muted); letter-spacing:.6px}
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius: 14px;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.82);
+      color: var(--ink);
+      cursor:pointer;
+      font-weight: 800;
+      letter-spacing:.2px;
+      transition: transform var(--t), background var(--t), border-color var(--t), box-shadow var(--t);
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.96); border-color: rgba(0,0,0,.16)}
+    .btn.primary{
+      background:
+        radial-gradient(circle at 20% 20%, rgba(199,155,42,.28), transparent 55%),
+        linear-gradient(135deg, rgba(212,59,69,.16), rgba(47,125,214,.14)),
+        rgba(255,255,255,.92);
+      border-color: rgba(199,155,42,.35);
+      box-shadow: 0 16px 40px rgba(0,0,0,.12);
+    }
+    .btn.primary:hover{border-color: rgba(199,155,42,.55)}
+
+    main{padding: 28px 0 60px}
+    .hero{
+      border-radius: var(--r-xl);
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(0,0,0,.10);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      overflow:hidden;
+      position:relative;
+    }
+    .hero::before{
+      content:"";
+      position:absolute; inset:-20%;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(199,155,42,.20), transparent 55%),
+        radial-gradient(circle at 90% 20%, rgba(47,125,214,.14), transparent 60%),
+        radial-gradient(circle at 35% 90%, rgba(212,59,69,.10), transparent 58%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .hero > *{position:relative}
+    h1{margin:0 0 8px; font-size: clamp(26px, 3.2vw, 40px); letter-spacing:-.6px}
+    .sub{margin:0; color:var(--muted); max-width:70ch}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 14px;
+      margin-top: 14px;
+      align-items:start;
+    }
+    .card{
+      border-radius: var(--r-lg);
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .pad{padding: 16px}
+
+    label{display:block; font-size: 12.5px; color: var(--muted); margin: 10px 0 6px}
+    input, textarea{
+      width:100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.95);
+      color: var(--ink);
+      outline:none;
+    }
+    input:focus, textarea:focus{border-color: rgba(47,125,214,.45)}
+    textarea{min-height: 120px; resize: vertical}
+
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .hint{font-size:12.5px; color: var(--muted)}
+    .status{
+      margin-top:10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.8);
+      display:none;
+    }
+    .status.show{display:block}
+    .status.ok{border-color: rgba(44,199,162,.35)}
+    .status.bad{border-color: rgba(212,59,69,.35)}
+
+    /* Stars */
+    .stars{
+      display:flex; gap:8px; align-items:center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.95);
+    }
+    .star{
+      width: 26px; height: 26px;
+      border-radius: 10px;
+      display:grid; place-items:center;
+      cursor:pointer;
+      border:1px solid rgba(0,0,0,.10);
+      transition: transform var(--t), background var(--t), border-color var(--t);
+      user-select:none;
+    }
+    .star:hover{transform: translateY(-1px)}
+    .star.on{
+      background: rgba(199,155,42,.22);
+      border-color: rgba(199,155,42,.45);
+    }
+
+    /* Review list */
+    .list{display:flex; flex-direction:column; gap:10px}
+    .review{
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.86);
+    }
+    .review .top{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    }
+    .review strong{display:block}
+    .meta{color:var(--muted); font-size:12.5px; margin-top:2px}
+    .pill{
+      font-size:12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.75);
+      white-space:nowrap;
+    }
+    .pill.gold{border-color: rgba(199,155,42,.35)}
+    .msg{margin:10px 0 0; color: rgba(26,27,30,.86)}
+    .skeleton{
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px dashed rgba(0,0,0,.14);
+      color: var(--muted);
+      background: rgba(255,255,255,.65);
+    }
+
+    @media (max-width: 900px){
+      .grid{grid-template-columns: 1fr}
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="index.html">
+          <div class="mark" aria-hidden="true"></div>
+          <div class="name">
+            <strong>Classic Cuts Barber Co.</strong>
+            <span>Reviews</span>
+          </div>
+        </a>
+
+        <div class="row">
+          <a class="btn" href="index.html">← Back Home</a>
+          <a class="btn primary" href="#write">Write a Review</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" aria-label="Reviews hero">
+      <h1>Tell us how we did ✂️</h1>
+      <p class="sub">
+        Leave a review below. Once you post, it will show up instantly on this page (and later we’ll also display them on the homepage).
+      </p>
+    </section>
+
+    <section class="grid" style="margin-top:14px">
+      <!-- FORM -->
+      <div class="card pad" id="write">
+        <h2 style="margin:0 0 6px; font-size:18px">Write a review</h2>
+        <p class="hint" style="margin:0 0 10px">
+          Please keep it respectful. (This demo includes basic validation + a small rate-limit.)
+        </p>
+
+        <form id="reviewForm">
+          <label for="name">Name</label>
+          <input id="name" name="name" placeholder="e.g., Jordan M." minlength="2" maxlength="40" required />
+
+          <label>Rating</label>
+          <div class="stars" role="radiogroup" aria-label="Rating">
+            <div class="star on" data-v="1" role="radio" aria-checked="true" tabindex="0">★</div>
+            <div class="star on" data-v="2" role="radio" aria-checked="true" tabindex="0">★</div>
+            <div class="star on" data-v="3" role="radio" aria-checked="true" tabindex="0">★</div>
+            <div class="star on" data-v="4" role="radio" aria-checked="true" tabindex="0">★</div>
+            <div class="star on" data-v="5" role="radio" aria-checked="true" tabindex="0">★</div>
+            <span class="hint" id="ratingText" style="margin-left:auto">5 / 5</span>
+          </div>
+
+          <label for="message">Your review</label>
+          <textarea id="message" name="message" placeholder="What did you like? (service, vibe, cut quality, etc.)" minlength="10" maxlength="600" required></textarea>
+
+          <div class="row" style="margin-top:12px; justify-content:space-between">
+            <span class="hint" id="rateHint">Tip: be specific (fade, line-up, beard, etc.)</span>
+            <button class="btn primary" id="submitBtn" type="submit">Post review</button>
+          </div>
+
+          <div class="status" id="statusBox"></div>
+        </form>
+      </div>
+
+      <!-- LIST -->
+      <div class="card pad" aria-label="Recent reviews">
+        <div class="row" style="justify-content:space-between; margin-bottom:6px">
+          <h2 style="margin:0; font-size:18px">Latest reviews</h2>
+          <span class="pill gold" id="countPill">Loading…</span>
+        </div>
+
+        <div class="list" id="reviewsList">
+          <div class="skeleton">Connecting to Firestore…</div>
+        </div>
+
+        <p class="hint" style="margin:12px 0 0">
+          If you see nothing: check Firestore is enabled + rules allow reads, and you’re not opening via <code>file://</code>.
+          Use GitHub Pages (or a local server).
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    // =========================
+    // Firebase + Firestore setup
+    // =========================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp,
+      query,
+      orderBy,
+      limit,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+    // (Analytics is optional; you can add it later if you want.)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRhMUJzbYt4KSURZAvLn9vHWEJlI3HtgA",
+      authDomain: "barbershopsitetest.firebaseapp.com",
+      projectId: "barbershopsitetest",
+      storageBucket: "barbershopsitetest.firebasestorage.app",
+      messagingSenderId: "676678702556",
+      appId: "1:676678702556:web:5f50699c3737e2feb0ab19",
+      measurementId: "G-MP8L9Z93RM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // =========================
+    // Small helpers
+    // =========================
+    const $ = (s, r=document) => r.querySelector(s);
+    const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+    const statusBox = $("#statusBox");
+    const submitBtn = $("#submitBtn");
+    const reviewsList = $("#reviewsList");
+    const countPill = $("#countPill");
+
+    function setStatus(type, msg){
+      statusBox.className = "status show " + (type === "ok" ? "ok" : "bad");
+      statusBox.textContent = msg;
+    }
+    function clearStatus(){
+      statusBox.className = "status";
+      statusBox.textContent = "";
+    }
+
+    function escapeTextToNode(text){
+      // We will always use textContent in the DOM (no innerHTML) to avoid XSS.
+      return document.createTextNode(text);
+    }
+
+    function formatStars(n){
+      // returns something like ★★★★☆
+      let out = "";
+      for(let i=1;i<=5;i++) out += (i<=n ? "★" : "☆");
+      return out;
+    }
+
+    // =========================
+    // Rating UI
+    // =========================
+    let rating = 5;
+    const ratingText = $("#ratingText");
+    const starEls = $$(".star");
+
+    function paintStars(){
+      starEls.forEach(el => {
+        const v = Number(el.dataset.v);
+        const on = v <= rating;
+        el.classList.toggle("on", on);
+        el.setAttribute("aria-checked", on ? "true" : "false");
+      });
+      ratingText.textContent = `${rating} / 5`;
+    }
+
+    function setRating(v){
+      rating = Math.max(1, Math.min(5, v));
+      paintStars();
+    }
+
+    starEls.forEach(el => {
+      el.addEventListener("click", () => setRating(Number(el.dataset.v)));
+      el.addEventListener("keydown", (e) => {
+        if(e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          setRating(Number(el.dataset.v));
+        }
+      });
+    });
+
+    paintStars();
+
+    // =========================
+    // Simple rate limit (client-side)
+    // =========================
+    const RATE_KEY = "cc_last_review_ts";
+    function canPostNow(){
+      const last = Number(localStorage.getItem(RATE_KEY) || "0");
+      const now = Date.now();
+      const waitMs = 30 * 1000; // 30 seconds
+      return { ok: (now - last) > waitMs, remainingMs: Math.max(0, waitMs - (now - last)) };
+    }
+
+    // =========================
+    // Submit review -> Firestore
+    // =========================
+    $("#reviewForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearStatus();
+
+      const { ok, remainingMs } = canPostNow();
+      if(!ok){
+        setStatus("bad", `Please wait ${Math.ceil(remainingMs/1000)}s before posting another review.`);
+        return;
+      }
+
+      const name = $("#name").value.trim();
+      const message = $("#message").value.trim();
+
+      if(name.length < 2 || name.length > 40){
+        setStatus("bad", "Name must be 2–40 characters.");
+        return;
+      }
+      if(message.length < 10 || message.length > 600){
+        setStatus("bad", "Review must be 10–600 characters.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Posting…";
+
+      try{
+        await addDoc(collection(db, "reviews"), {
+          name,
+          rating,
+          message,
+          createdAt: serverTimestamp()
+        });
+
+        localStorage.setItem(RATE_KEY, String(Date.now()));
+        e.target.reset();
+        setRating(5);
+        setStatus("ok", "Posted! Thanks for the review 🙌");
+      }catch(err){
+        console.error(err);
+        setStatus("bad", "Couldn’t post. Check Firestore rules + that Firestore is enabled.");
+      }finally{
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Post review";
+      }
+    });
+
+    // =========================
+    // Live reviews feed
+    // =========================
+    const q = query(collection(db, "reviews"), orderBy("createdAt", "desc"), limit(25));
+
+    onSnapshot(q, (snap) => {
+      reviewsList.innerHTML = "";
+      countPill.textContent = `${snap.size} shown`;
+
+      if(snap.empty){
+        const empty = document.createElement("div");
+        empty.className = "skeleton";
+        empty.textContent = "No reviews yet — be the first.";
+        reviewsList.appendChild(empty);
+        return;
+      }
+
+      snap.forEach(docSnap => {
+        const d = docSnap.data();
+
+        const item = document.createElement("div");
+        item.className = "review";
+
+        const top = document.createElement("div");
+        top.className = "top";
+
+        const left = document.createElement("div");
+        const strong = document.createElement("strong");
+        strong.textContent = (d.name || "Anonymous");
+        left.appendChild(strong);
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = (typeof d.rating === "number" ? formatStars(d.rating) : "★★★★★");
+        left.appendChild(meta);
+
+        const pill = document.createElement("span");
+        pill.className = "pill";
+        pill.textContent = "Customer";
+        top.appendChild(left);
+        top.appendChild(pill);
+
+        const msg = document.createElement("p");
+        msg.className = "msg";
+        msg.textContent = d.message || "";
+
+        item.appendChild(top);
+        item.appendChild(msg);
+
+        reviewsList.appendChild(item);
+      });
+    }, (err) => {
+      console.error(err);
+      reviewsList.innerHTML = "";
+      const bad = document.createElement("div");
+      bad.className = "skeleton";
+      bad.textContent = "Failed to load reviews. Check Firestore rules and that reads are allowed.";
+      reviewsList.appendChild(bad);
+      countPill.textContent = "Error";
+    });
+  </script>
+</body>
+</html>
