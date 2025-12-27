@@ -1,221 +1,517 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-  import {
-    getFirestore,
-    collection,
-    query,
-    orderBy,
-    limit,
-    onSnapshot
-  } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Write a Review | Classic Cuts Barber Co.</title>
+  <meta name="description" content="Leave a review for Classic Cuts Barber Co. Reviews appear on the homepage automatically." />
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCRhMUJzbYt4KSURZAvLn9vHWEJlI3HtgA",
-    authDomain: "barbershopsitetest.firebaseapp.com",
-    projectId: "barbershopsitetest",
-    storageBucket: "barbershopsitetest.firebasestorage.app",
-    messagingSenderId: "676678702556",
-    appId: "1:676678702556:web:5f50699c3737e2feb0ab19",
-    measurementId: "G-MP8L9Z93RM"
-  };
+  <style>
+    :root{
+      --brand:#f6f3ee;
+      --ink:#1a1b1e;
+      --muted:rgba(26,27,30,.68);
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+      --card:rgba(255,255,255,.84);
+      --stroke:rgba(0,0,0,.08);
+      --shadow:0 14px 40px rgba(20,20,20,.10);
 
-  const grid = document.getElementById("reviewsGrid");
-  const status = document.getElementById("reviewsStatus");
+      --gold:#c79b2a;
+      --crimson:#d43b45;
+      --azure:#2f7dd6;
+      --mint:#2cc7a2;
 
-  const avgNumEl = document.getElementById("avgRatingNumber");
-  const avgStarsEl = document.getElementById("avgRatingStars");
-  const avgCountEl = document.getElementById("avgRatingCount");
+      --radius-xl:28px;
+      --radius-lg:18px;
+      --radius-md:14px;
 
-  function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
-
-  // Create one star SVG where fillPercent can be 0..100
-  function starSvg(fillPercent){
-    const id = "g" + Math.random().toString(16).slice(2);
-    const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
-    svg.setAttribute("viewBox","0 0 24 24");
-    svg.setAttribute("aria-hidden","true");
-
-    // Star shape path
-    const d = "M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z";
-
-    // Defs gradient for partial fill
-    const defs = document.createElementNS("http://www.w3.org/2000/svg","defs");
-    const grad = document.createElementNS("http://www.w3.org/2000/svg","linearGradient");
-    grad.setAttribute("id", id);
-    grad.setAttribute("x1","0"); grad.setAttribute("x2","1");
-    grad.setAttribute("y1","0"); grad.setAttribute("y2","0");
-
-    const stop1 = document.createElementNS("http://www.w3.org/2000/svg","stop");
-    stop1.setAttribute("offset", `${clamp(fillPercent,0,100)}%`);
-    stop1.setAttribute("stop-color", "rgba(199,155,42,0.95)"); // gold
-
-    const stop2 = document.createElementNS("http://www.w3.org/2000/svg","stop");
-    stop2.setAttribute("offset", `${clamp(fillPercent,0,100)}%`);
-    stop2.setAttribute("stop-color", "rgba(0,0,0,0.15)"); // empty side
-
-    grad.appendChild(stop1);
-    grad.appendChild(stop2);
-    defs.appendChild(grad);
-    svg.appendChild(defs);
-
-    // Star filled by gradient
-    const star = document.createElementNS("http://www.w3.org/2000/svg","path");
-    star.setAttribute("d", d);
-    star.setAttribute("fill", `url(#${id})`);
-    svg.appendChild(star);
-
-    return svg;
-  }
-
-  function renderAverage(avg, count){
-    if(!avgNumEl || !avgStarsEl || !avgCountEl) return;
-
-    if(!count){
-      avgNumEl.textContent = "—";
-      avgStarsEl.innerHTML = "";
-      avgCountEl.textContent = "No reviews yet";
-      return;
+      --container:980px;
+      --ease:cubic-bezier(.2,.8,.2,1);
+      --t:220ms var(--ease);
     }
 
-    const rounded = Math.round(avg * 10) / 10;     // 1 decimal
-    avgNumEl.textContent = rounded.toFixed(1);
-    avgCountEl.textContent = `${count} review${count === 1 ? "" : "s"}`;
-
-    avgStarsEl.innerHTML = "";
-    for(let i=1;i<=5;i++){
-      const amount = clamp(avg - (i - 1), 0, 1);   // 0..1 for this star
-      avgStarsEl.appendChild(starSvg(amount * 100));
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1100px 700px at 80% -15%, rgba(47,125,214,.18), transparent 55%),
+        radial-gradient(900px 620px at 10% 0%, rgba(199,155,42,.22), transparent 60%),
+        radial-gradient(900px 650px at 90% 35%, rgba(212,59,69,.10), transparent 58%),
+        linear-gradient(180deg, #ffffff 0%, var(--brand) 55%, #ffffff 100%);
+      color:var(--ink);
+      line-height:1.55;
+      overflow-x:hidden;
     }
-  }
 
-  function starsText(n){
-    const r = clamp(Number(n) || 5, 1, 5);
-    let s = "";
-    for(let i=1;i<=5;i++) s += (i <= r ? "★" : "☆");
-    return { r, s };
-  }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:var(--container); margin:0 auto; padding:0 18px}
+    .noise{
+      position:fixed; inset:0; pointer-events:none; opacity:.08; z-index:0;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="220" height="220" filter="url(%23n)" opacity="0.6"/></svg>');
+      mix-blend-mode: overlay;
+    }
+    .pole-stripes{
+      position:fixed; inset:-40vh -40vw; pointer-events:none; opacity:.06; z-index:0;
+      background:repeating-linear-gradient(135deg,
+        rgba(212,59,69,.85) 0 18px,
+        rgba(255,255,255,.9) 18px 36px,
+        rgba(47,125,214,.85) 36px 54px,
+        rgba(255,255,255,.9) 54px 72px
+      );
+      filter: blur(14px);
+      transform: translate3d(0,0,0);
+      animation: drift 22s linear infinite;
+    }
+    @keyframes drift{from{transform:translate3d(-3%,-3%,0)}to{transform:translate3d(3%,3%,0)}}
 
-  function makeCard({ name, rating, message }){
-    const article = document.createElement("article");
-    article.className = "card pad";
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(to bottom, rgba(255,255,255,.82), rgba(255,255,255,.55));
+      border-bottom:1px solid rgba(0,0,0,.08);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0; gap:14px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .mark{
+      width:38px; height:38px; border-radius:12px; position:relative; overflow:hidden;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(230,193,90,.85), rgba(230,193,90,.05) 58%),
+        linear-gradient(135deg, rgba(215,52,70,.8), rgba(58,166,255,.8));
+      box-shadow: 0 12px 32px rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    .mark::after{
+      content:""; position:absolute; inset:-30%;
+      background: repeating-linear-gradient(135deg, rgba(255,255,255,.55) 0 10px, rgba(255,255,255,0) 10px 20px);
+      transform: rotate(10deg); opacity:.22;
+    }
+    .name{display:flex; flex-direction:column; line-height:1.05}
+    .name strong{letter-spacing:.4px}
+    .name span{font-size:12.5px; color:var(--muted); letter-spacing:.6px}
 
-    const top = document.createElement("div");
-    top.className = "topline";
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding:10px 14px; border-radius:14px;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.72);
+      color: var(--ink);
+      cursor:pointer;
+      transition: transform var(--t), background var(--t), border-color var(--t), box-shadow var(--t);
+      user-select:none;
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.92); border-color: rgba(0,0,0,.16)}
+    .btn.primary{
+      background:
+        radial-gradient(circle at 20% 20%, rgba(199,155,42,.30), transparent 55%),
+        linear-gradient(135deg, rgba(212,59,69,.18), rgba(47,125,214,.16)),
+        rgba(255,255,255,.90);
+      border-color: rgba(199,155,42,.35);
+      box-shadow: 0 16px 40px rgba(0,0,0,.12);
+    }
+    .btn.primary:hover{border-color: rgba(199,155,42,.55)}
 
-    const title = document.createElement("strong");
-    const safeMsg = (message || "").trim();
-    title.textContent = safeMsg
-      ? `“${safeMsg.slice(0, 52)}${safeMsg.length > 52 ? "…" : ""}”`
-      : "“Great cut.”";
+    main{position:relative; z-index:1}
+    .hero{
+      padding: 34px 0 18px;
+    }
+    .card{
+      border-radius: var(--radius-xl);
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card.pad{padding:18px}
+    h1{
+      margin:0 0 8px;
+      font-size: clamp(28px, 3.6vw, 40px);
+      line-height:1.08;
+      letter-spacing:-.6px;
+    }
+    .sub{
+      margin:0;
+      color:var(--muted);
+      max-width:70ch;
+    }
 
-    const chip = document.createElement("span");
-    chip.className = "chip gold";
-    chip.textContent = "Verified";
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:14px;
+      align-items:start;
+      margin-top:14px;
+    }
 
-    top.appendChild(title);
-    top.appendChild(chip);
+    .field{margin-top:12px}
+    label{
+      display:block;
+      font-size:12.5px;
+      color: rgba(26,27,30,.82);
+      margin-bottom:6px;
+      font-weight:700;
+    }
+    input, textarea{
+      width:100%;
+      padding: 11px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.90);
+      color: var(--ink);
+      outline:none;
+    }
+    input:focus, textarea:focus{
+      border-color: rgba(199,155,42,.55);
+      box-shadow: 0 0 0 4px rgba(199,155,42,.12);
+    }
+    textarea{min-height: 120px; resize: vertical}
 
-    const { r, s } = starsText(rating);
+    .mini{font-size:12.5px; color:var(--muted)}
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      margin-top:14px;
+    }
 
-    const stars = document.createElement("div");
-    stars.className = "stars";
-    stars.setAttribute("aria-label", `${r} stars`);
-    stars.textContent = s;
+    /* Rating UI */
+    .rating-wrap{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:12px;
+      border-radius: 18px;
+      border:1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.72);
+    }
+    .stars{
+      display:inline-flex;
+      gap:6px;
+    }
+    .star-btn{
+      width:40px; height:40px;
+      border-radius: 14px;
+      border:1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.90);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      transition: transform var(--t), border-color var(--t), background var(--t);
+      font-size:20px;
+      line-height:1;
+    }
+    .star-btn:hover{transform: translateY(-1px); border-color: rgba(0,0,0,.18)}
+    .star-btn[aria-pressed="true"]{
+      border-color: rgba(199,155,42,.45);
+      background: rgba(199,155,42,.12);
+    }
+    .rating-pill{
+      font-weight:900;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.90);
+    }
 
-    const quote = document.createElement("p");
-    quote.className = "quote";
-    quote.textContent = safeMsg || "—";
+    .side{
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.75);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    .tip{
+      padding: 12px;
+      border-radius: 18px;
+      border:1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.78);
+      margin-top:10px;
+    }
+    .tip strong{display:block; margin-bottom:4px}
+    .ok{
+      display:none;
+      margin-top:12px;
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(44,199,162,.35);
+      background: rgba(44,199,162,.12);
+      font-weight:800;
+    }
+    .err{
+      display:none;
+      margin-top:12px;
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(212,59,69,.35);
+      background: rgba(212,59,69,.10);
+      font-weight:800;
+    }
 
-    const who = document.createElement("div");
-    who.className = "who";
+    footer{
+      padding: 24px 0 40px;
+      color: var(--muted);
+    }
 
-    const left = document.createElement("span");
-    left.textContent = `— ${name || "Anonymous"}`;
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+    }
+    @media (prefers-reduced-motion: reduce){
+      html{scroll-behavior:auto}
+      .pole-stripes{animation:none}
+      .btn, .star-btn{transition:none}
+    }
+  </style>
+</head>
 
-    const right = document.createElement("span");
-    right.textContent = "Customer";
+<body>
+  <div class="pole-stripes" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
 
-    who.appendChild(left);
-    who.appendChild(right);
+  <header>
+    <div class="container">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html" title="Back to home">
+          <div class="mark" aria-hidden="true"></div>
+          <div class="name">
+            <strong>Classic Cuts Barber Co.</strong>
+            <span>Write a review</span>
+          </div>
+        </a>
 
-    article.appendChild(top);
-    article.appendChild(stars);
-    article.appendChild(quote);
-    article.appendChild(who);
-
-    return article;
-  }
-
-  // NOTE: requires createdAt (Timestamp) on docs.
-  const q = query(collection(db, "reviews"), orderBy("createdAt", "desc"), limit(30));
-
-  onSnapshot(q, (snap) => {
-    grid.innerHTML = "";
-
-    if(status) status.textContent = snap.empty ? "No reviews yet" : `${snap.size} live`;
-
-    if(snap.empty){
-      renderAverage(0, 0);
-
-      const empty = document.createElement("article");
-      empty.className = "card pad";
-      empty.style.gridColumn = "span 12";
-      empty.innerHTML = `
-        <div class="topline">
-          <strong>No reviews yet</strong>
-          <span class="chip blue">Be first</span>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end">
+          <a class="btn" href="index.html#reviews">View Reviews</a>
+          <a class="btn primary" href="index.html">Home</a>
         </div>
-        <p class="quote">Tap “Write a Review” to leave the first one.</p>
-      `;
-      grid.appendChild(empty);
-      return;
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container hero">
+      <div class="card pad">
+        <h1>Leave a Review</h1>
+        <p class="sub">
+          Your review is saved in Firestore and will appear on the homepage automatically.
+        </p>
+
+        <div class="grid">
+          <!-- FORM -->
+          <div>
+            <form id="reviewForm" novalidate>
+              <div class="field">
+                <label for="name">Your name</label>
+                <input id="name" name="name" autocomplete="name" placeholder="e.g., Jordan M." maxlength="40" />
+                <div class="mini" style="margin-top:6px">Optional. Leave blank to post as “Anonymous”.</div>
+              </div>
+
+              <div class="field">
+                <label>Rating</label>
+                <div class="rating-wrap">
+                  <div class="stars" id="ratingStars" aria-label="Choose a rating from 1 to 5"></div>
+                  <span class="rating-pill" id="ratingValue">5.0</span>
+                  <span class="mini" id="ratingHint">Tap a star to set your rating.</span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="message">Your review</label>
+                <textarea id="message" name="message" placeholder="What did you like? (clean fade, friendly service, beard shaping, etc.)" maxlength="600" required></textarea>
+                <div class="mini" style="margin-top:6px"><span id="charCount">0</span>/600</div>
+              </div>
+
+              <div class="row">
+                <span class="mini" id="submitStatus">Ready.</span>
+                <div style="display:flex; gap:10px; flex-wrap:wrap">
+                  <button class="btn" type="button" id="resetBtn">Reset</button>
+                  <button class="btn primary" type="submit" id="submitBtn">Submit Review</button>
+                </div>
+              </div>
+
+              <div class="ok" id="okBox">✅ Review posted! It should show on the homepage in a moment.</div>
+              <div class="err" id="errBox">❌ Couldn’t post your review. Check Firestore rules or console errors.</div>
+            </form>
+          </div>
+
+          <!-- SIDE INFO -->
+          <aside class="side" aria-label="Review tips">
+            <strong style="font-size:16px">Quick tips</strong>
+            <div class="tip">
+              <strong>Be specific</strong>
+              <div class="mini">Example: “Clean mid fade + great lineup” beats “Good.”</div>
+            </div>
+            <div class="tip">
+              <strong>Keep it real</strong>
+              <div class="mini">No phone numbers / emails in reviews (privacy).</div>
+            </div>
+            <div class="tip">
+              <strong>Moderation note</strong>
+              <div class="mini">If you later add moderation, you can hide reviews until approved.</div>
+            </div>
+
+            <div class="tip">
+              <strong>Important</strong>
+              <div class="mini">
+                Your homepage query uses <b>orderBy("createdAt")</b>. This page sets <b>createdAt</b> automatically when saving.
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="container">
+        <div class="mini">© <span id="year"></span> Classic Cuts Barber Co.</div>
+      </div>
+    </footer>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+    // 🔥 Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRhMUJzbYt4KSURZAvLn9vHWEJlI3HtgA",
+      authDomain: "barbershopsitetest.firebaseapp.com",
+      projectId: "barbershopsitetest",
+      storageBucket: "barbershopsitetest.firebasestorage.app",
+      messagingSenderId: "676678702556",
+      appId: "1:676678702556:web:5f50699c3737e2feb0ab19",
+      measurementId: "G-MP8L9Z93RM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const yearEl = document.getElementById("year");
+    yearEl.textContent = new Date().getFullYear();
+
+    const form = document.getElementById("reviewForm");
+    const nameEl = document.getElementById("name");
+    const msgEl = document.getElementById("message");
+    const charCountEl = document.getElementById("charCount");
+
+    const submitBtn = document.getElementById("submitBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const submitStatus = document.getElementById("submitStatus");
+
+    const okBox = document.getElementById("okBox");
+    const errBox = document.getElementById("errBox");
+
+    const starsWrap = document.getElementById("ratingStars");
+    const ratingValueEl = document.getElementById("ratingValue");
+
+    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
+    // Rating state
+    let rating = 5;
+
+    function setRating(n){
+      rating = clamp(Number(n) || 5, 1, 5);
+      ratingValueEl.textContent = rating.toFixed(1);
+      // highlight stars
+      [...starsWrap.querySelectorAll("button")].forEach((btn, i) => {
+        const active = i < rating;
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
+        btn.textContent = active ? "★" : "☆";
+      });
     }
 
-    // Compute average from snapshot
-    let sum = 0;
-    let count = 0;
+    // Build star buttons (1..5)
+    for(let i=1;i<=5;i++){
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "star-btn";
+      b.setAttribute("aria-label", `${i} star${i===1?"":"s"}`);
+      b.addEventListener("click", () => setRating(i));
+      starsWrap.appendChild(b);
+    }
+    setRating(5);
 
-    snap.forEach(docSnap => {
-      const d = docSnap.data() || {};
-      const rating = clamp(Number(d.rating) || 0, 1, 5);
-      sum += rating;
-      count += 1;
+    // Char count
+    const updateCount = () => { charCountEl.textContent = String((msgEl.value || "").length); };
+    msgEl.addEventListener("input", updateCount);
+    updateCount();
+
+    // Basic safety: block sharing contact info (simple heuristic)
+    function looksLikeContactInfo(text){
+      const t = (text || "").toLowerCase();
+      const hasEmail = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i.test(t);
+      const hasPhone = /(\+?\d[\d\s().-]{7,}\d)/.test(t);
+      return hasEmail || hasPhone;
+    }
+
+    function show(el){ el.style.display = "block"; }
+    function hide(el){ el.style.display = "none"; }
+
+    function setBusy(b){
+      submitBtn.disabled = b;
+      submitBtn.style.opacity = b ? ".75" : "1";
+      submitStatus.textContent = b ? "Submitting…" : "Ready.";
+    }
+
+    resetBtn.addEventListener("click", () => {
+      hide(okBox); hide(errBox);
+      form.reset();
+      setRating(5);
+      updateCount();
+      submitStatus.textContent = "Ready.";
     });
 
-    const avg = sum / count;
-    renderAverage(avg, count);
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hide(okBox); hide(errBox);
 
-    // Render cards
-    snap.forEach(docSnap => {
-      const d = docSnap.data() || {};
-      const name = typeof d.name === "string" ? d.name : "Anonymous";
-      const message = typeof d.message === "string" ? d.message : "";
-      const rating = clamp(Number(d.rating) || 5, 1, 5);
-      grid.appendChild(makeCard({ name, rating, message }));
+      const name = (nameEl.value || "").trim().slice(0,40);
+      const message = (msgEl.value || "").trim().slice(0,600);
+
+      if(!message){
+        submitStatus.textContent = "Please write a short review first.";
+        return;
+      }
+
+      if(looksLikeContactInfo(message)){
+        submitStatus.textContent = "Please remove emails / phone numbers from the review (privacy).";
+        return;
+      }
+
+      setBusy(true);
+
+      try{
+        await addDoc(collection(db, "reviews"), {
+          name: name || "Anonymous",
+          message,
+          rating: rating,
+          createdAt: serverTimestamp()
+        });
+
+        show(okBox);
+        submitStatus.textContent = "Posted!";
+        form.reset();
+        setRating(5);
+        updateCount();
+
+      }catch(err){
+        console.error(err);
+        show(errBox);
+        submitStatus.textContent = "Error submitting.";
+      }finally{
+        setBusy(false);
+      }
     });
-
-  }, (err) => {
-    console.error(err);
-
-    if(status) status.textContent = "Error loading";
-    renderAverage(0, 0);
-
-    grid.innerHTML = "";
-    const bad = document.createElement("article");
-    bad.className = "card pad";
-    bad.style.gridColumn = "span 12";
-    bad.innerHTML = `
-      <div class="topline">
-        <strong>Couldn’t load reviews</strong>
-        <span class="chip red">Check Firestore</span>
-      </div>
-      <p class="quote">
-        Most common causes: (1) Firestore rules block reads, or (2) your reviews docs are missing <b>createdAt</b>.
-      </p>
-    `;
-    grid.appendChild(bad);
-  });
-</script>
+  </script>
+</body>
+</html>
